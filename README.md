@@ -112,3 +112,18 @@ composer test
 
 MIT.
 
+
+## Validation History Persistence
+
+Every validation attempt is persisted to the `invoice_validations` table for auditing and analytics purposes.
+
+### Rationale
+- **Auditing**: Track who validated what and when to detect patterns or recurring errors.
+- **Analytics**: Measure the most common validation failures (e.g., incorrect PIVA checksum vs. total mismatch).
+- **Scalability**: We use **UUIDs** for records to ensure unique identifiers across distributed environments and prevent ID enumeration.
+- **Modern Storage**: **Native JSON columns** are used for errors and warnings, allowing for efficient querying of specific failure types without a complex schema.
+
+### Implementation Details
+- **Database**: MySQL 8+ with JSON support.
+- **ORM**: CakePHP 5 ORM with custom `json` type mapping.
+- **UUIDs**: Application-side UUID generation for primary keys.

@@ -14,8 +14,21 @@ class InvoiceValidatorService
 
     private const TOLERANCE_ERROR = 0.01;
 
+    protected \Cake\ORM\Table $table;
+
+    /**
+     * Constructor
+     *
+     * @param \Cake\ORM\Table|null $table Optional table for injection (tests)
+     */
+    public function __construct(?\Cake\ORM\Table $table = null)
+    {
+        $this->table = $table ?? \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
+    }
+
     /**
      * Validate invoice payload and return validation result.
+     * Persists the attempt in history regardless of validity.
      *
      * @param array<string, mixed> $data Decoded JSON with partita_iva, imponibile, aliquota_iva, totale_dichiarato
      * @return array{valid: bool, total_calculated: float, errors: list<string>, warnings: list<string>}
@@ -25,66 +38,69 @@ class InvoiceValidatorService
         $errors = [];
         $warnings = [];
 
-        $partitaIva = $data['partita_iva'] ?? null;
-        $imponibile = isset($data['imponibile']) ? $this->toFloat($data['imponibile']) : null;
-        $aliquotaIva = isset($data['aliquota_iva']) ? $this->toFloat($data['aliquota_iva']) : null;
-        $totaleDichiarato = isset($data['totale_dichiarato']) ? $this->toFloat($data['totale_dichiarato']) : null;
+        $partitaIva = (string)($data['partita_iva'] ?? '');
+        $imponibile = isset($data['imponibile']) ? $this->toFloat($data['imponibile']) : 0.0;
+        $aliquotaIva = isset($data['aliquota_iva']) ? $this->toFloat($data['aliquota_iva']) : 0.0;
+        $totaleDichiarato = isset($data['totale_dichiarato']) ? $this->toFloat($data['totale_dichiarato']) : 0.0;
 
         // Partita IVA Specific Validation
-        if ($partitaIva === null || $partitaIva === '' || strlen((string)$partitaIva) !== self::VAT_DIGITS || !ctype_digit((string)$partitaIva)) {
+        if ($partitaIva === '' || strlen($partitaIva) !== self::VAT_DIGITS || !ctype_digit($partitaIva)) {
             $errors[] = 'La Partita IVA deve contenere esattamente 11 cifre numeriche.';
         }
-        elseif (!$this->isValidVatChecksum((string)$partitaIva)) {
+        elseif (!$this->isValidVatChecksum($partitaIva)) {
             $errors[] = 'La Partita IVA inserita non è valida (errore nel codice di controllo).';
         }
 
-        if ($imponibile === null || $imponibile < 0) {
-            $errors[] = "L'imponibile è obbligatorio e deve essere un numero non negativo.";
+        if ($imponibile < 0) {
+            $errors[] = "L'imponibile deve essere un numero non negativo.";
         }
 
-        if ($aliquotaIva === null || $aliquotaIva < 0) {
-            $errors[] = "L'aliquota IVA è obbligatoria e deve essere un numero non negativo.";
+        if ($aliquotaIva < 0) {
+            $errors[] = "L'aliquota IVA deve essere un numero non negativo.";
         }
 
-        if ($totaleDichiarato === null || $totaleDichiarato < 0) {
-            $errors[] = 'Il totale dichiarato è obbligatorio e deve essere un numero non negativo.';
+        if ($totaleDichiarato < 0) {
+            $errors[] = 'Il totale dichiarato deve essere un numero non negativo.';
         }
 
-        if ($errors !== []) {
-            return [
-                'valid' => false,
-                'total_calculated' => 0.0,
-                'errors' => $errors,
-                'warnings' => [],
-            ];
+        $totalCalculated = 0.0;
+        if ($errors === []) {
+            $ivaAmount = $this->round2($imponibile * $aliquotaIva / 100);
+            $totalCalculated = $this->round2($imponibile + $ivaAmount);
+            $difference = abs($totalCalculated - $totaleDichiarato);
+
+            if ($difference > self::TOLERANCE_ERROR) {
+                $errors[] = sprintf(
+                    'Il totale dichiarato (%.2f €) non corrisponde al totale calcolato (%.2f €).',
+                    $totaleDichiarato,
+                    $totalCalculated
+                );
+            }
+            elseif ($difference > 0) {
+                $warnings[] = 'Lieve differenza di arrotondamento tra il totale calcolato e quello dichiarato.';
+            }
         }
 
-        $ivaAmount = $this->round2($imponibile * $aliquotaIva / 100);
-        $totalCalculated = $this->round2($imponibile + $ivaAmount);
-        $difference = abs($totalCalculated - $totaleDichiarato);
+        $isValid = $errors === [];
 
-        if ($difference > self::TOLERANCE_ERROR) {
-            $errors[] = sprintf(
-                'Il totale dichiarato (%.2f €) non corrisponde al totale calcolato (%.2f €).',
-                $totaleDichiarato,
-                $totalCalculated
-            );
-            return [
-                'valid' => false,
-                'total_calculated' => $totalCalculated,
-                'errors' => $errors,
-                'warnings' => $warnings,
-            ];
-        }
-
-        if ($difference > 0 && $difference <= self::TOLERANCE_ERROR) {
-            $warnings[] = 'Lieve differenza di arrotondamento tra il totale calcolato e quello dichiarato.';
-        }
+        // Validation History Persistence
+        $entity = $this->table->newEntity([
+            'partita_iva' => substr($partitaIva, 0, 11),
+            'imponibile' => $imponibile,
+            'aliquota_iva' => $aliquotaIva,
+            'totale_dichiarato' => $totaleDichiarato,
+            'total_calculated' => $totalCalculated,
+            'valid' => $isValid,
+            'errors' => $errors,
+            'warnings' => $warnings,
+            'created' => new \Cake\I18n\DateTime(),
+        ]);
+        $this->table->save($entity);
 
         return [
-            'valid' => true,
+            'valid' => $isValid,
             'total_calculated' => $totalCalculated,
-            'errors' => [],
+            'errors' => $errors,
             'warnings' => $warnings,
         ];
     }

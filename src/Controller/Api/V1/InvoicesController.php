@@ -15,6 +15,24 @@ use Cake\Http\Response;
 class InvoicesController extends AppController
 {
     /**
+     * GET /api/v1/invoices
+     * Returns the last 10 validation attempts.
+     */
+    public function index(): Response
+    {
+        $this->request->allowMethod(['get']);
+
+        $table = \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
+        $history = $table->find()
+            ->select(['id', 'partita_iva', 'imponibile', 'valid', 'created'])
+            ->orderBy(['created' => 'DESC'])
+            ->limit(10)
+            ->all();
+
+        return $this->respondJson(200, $history->toArray());
+    }
+
+    /**
      * POST /api/v1/invoices/validate
      * Expects JSON: partita_iva, imponibile, aliquota_iva, totale_dichiarato
      */

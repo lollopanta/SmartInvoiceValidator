@@ -3,24 +3,34 @@
  * All API calls live here; components use this module only.
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/$/, '')
+const HISTORY_PATH = '/api/v1/invoices'
 const VALIDATE_PATH = '/api/v1/invoices/validate'
 
 /**
- * @typedef {Object} ValidatePayload
+ * @typedef {Object} HistoryRecord
+ * @property {string} id
  * @property {string} partita_iva
  * @property {number} imponibile
- * @property {number} aliquota_iva
- * @property {number} totale_dichiarato
+ * @property {boolean} valid
+ * @property {string} created
  */
 
 /**
- * @typedef {Object} ValidateResult
- * @property {boolean} valid
- * @property {number} total_calculated
- * @property {string[]} errors
- * @property {string[]} warnings
+ * GET /api/v1/invoices
+ * @returns {Promise<HistoryRecord[]>}
  */
+export async function getValidationHistory() {
+  const url = `${API_BASE.replace(/\/$/, '')}${HISTORY_PATH}`
+  try {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    console.error('Failed to fetch history:', err)
+    return []
+  }
+}
 
 /**
  * POST /api/v1/invoices/validate

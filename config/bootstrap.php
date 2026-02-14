@@ -28,11 +28,16 @@ define('TESTS', ROOT . 'tests' . DS);
 define('LOGS', ROOT . 'logs' . DS);
 define('CACHE', ROOT . 'tmp' . DS . 'cache' . DS);
 define('RESOURCES', ROOT . 'resources' . DS);
+define('APP', ROOT . APP_DIR . DS);
+define('CORE_PATH', ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS);
+define('CAKE', CORE_PATH . 'src' . DS);
 
 require ROOT . 'vendor' . DS . 'autoload.php';
 
 require ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS . 'src' . DS . 'Core' . DS . 'functions.php';
 require ROOT . 'vendor' . DS . 'cakephp' . DS . 'cakephp' . DS . 'src' . DS . 'Core' . DS . 'functions_global.php';
+
+\Cake\Database\TypeFactory::map('json', 'Cake\Database\Type\JsonType');
 
 $envFile = ROOT . '.env';
 if (file_exists($envFile) && class_exists(\josegonzalez\Dotenv\Loader::class)) {

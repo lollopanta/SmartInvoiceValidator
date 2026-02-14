@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+$app = require dirname(__DIR__) . '/config/bootstrap.php';
+
+use Cake\Console\CommandRunner;
+
+$runner = new CommandRunner($app);
+exit($runner->run($argv));

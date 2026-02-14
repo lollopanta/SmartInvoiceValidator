@@ -41,7 +41,7 @@
 
         <!-- Success Message -->
         <div v-if="status === 'valid'" class="success-message">
-          <i class="fas fa-check-circle mr-2"></i> Tutti i controlli sono stati superati con successo.
+          <i class="fas fa-check-circle mr-2"></i> {{ t('result.success_msg') }}
         </div>
       </template>
     </div>
@@ -50,8 +50,10 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StatusBadge from './StatusBadge.vue'
 
+const { t } = useI18n()
 const props = defineProps({
   /** { ok, status, data?, error? } from api */
   result: { type: Object, default: null },
@@ -70,9 +72,9 @@ const status = computed(() => {
 })
 
 const title = computed(() => {
-  if (status.value === 'valid') return 'Documento Valido'
-  if (status.value === 'warning') return 'Avviso'
-  return 'Errori riscontrati'
+  if (status.value === 'valid') return t('result.valid')
+  if (status.value === 'warning') return t('result.warnings')
+  return t('result.invalid')
 })
 
 const statusClass = computed(() => {
@@ -88,21 +90,27 @@ const textClass = computed(() => {
 })
 
 const data = computed(() => props.result?.data ?? null)
-const networkError = computed(() => props.result && !props.result.ok ? props.result.error : null)
+const networkError = computed(() => {
+  if (props.result && !props.result.ok) {
+     if (props.result.status === 422) return t('errors.invalid_data')
+     return t('errors.server_error', { status: props.result.status })
+  }
+  return null
+})
 const errors = computed(() => data.value?.errors ?? [])
 const warnings = computed(() => data.value?.warnings ?? [])
 const totalCalculated = computed(() => data.value?.total_calculated ?? null)
-const firstError = computed(() => errors.value[0] ?? null)
 
 function getErrorIcon(msg) {
-  if (msg.includes('cifre numeriche') || msg.includes('obbligatorio') || msg.includes('non valido')) {
-    return 'fas fa-pen-nib' // Input/Structural
+  const m = msg.toLowerCase()
+  if (m.includes('cifre') || m.includes('digits') || m.includes('obbligatorio') || m.includes('required')) {
+    return 'fas fa-pen-nib'
   }
-  if (msg.includes('codice di controllo')) {
-    return 'fas fa-fingerprint' // Checksum
+  if (m.includes('controllo') || m.includes('checksum')) {
+    return 'fas fa-fingerprint'
   }
-  if (msg.includes('corrisponde')) {
-    return 'fas fa-calculator' // Calculation
+  if (m.includes('corrisponde') || m.includes('match')) {
+    return 'fas fa-calculator'
   }
   return 'fas fa-exclamation-circle'
 }

@@ -1,0 +1,48 @@
+{
+    "app": {
+        "title": "Smart {invoice} Validator",
+        "invoice": "Invoice",
+        "subtitle": "Millimetric precision for your electronic invoices.",
+        "badges": {
+            "auditing": "Auditing Active"
+        },
+        "footer": "© 2026 SmartInvoiceValidator. All rights reserved."
+    },
+    "form": {
+        "partita_iva": "VAT Number",
+        "imponibile": "Taxable Amount",
+        "aliquota_iva": "VAT Rate",
+        "totale_dichiarato": "Declared Total",
+        "validate_btn": "Validate Invoice",
+        "validating_btn": "Validating...",
+        "examples": {
+            "partita_iva": "e.g. 12345678901",
+            "imponibile": "Net amount",
+            "aliquota_iva": "e.g. 22",
+            "totale_dichiarato": "Total with VAT"
+        }
+    },
+    "result": {
+        "valid": "Invoice Valid",
+        "invalid": "Validation Failed",
+        "calculated": "Calculated Total",
+        "errors": "Errors",
+        "warnings": "Warnings",
+        "success_msg": "The invoice data is formally correct according to SDI regulations."
+    },
+    "history": {
+        "title": "Validation History",
+        "empty": "No recent validations found.",
+        "date": "Date",
+        "partita_iva": "VAT Number",
+        "imponibile": "Taxable",
+        "status": "Status",
+        "valid": "Valid",
+        "invalid": "Invalid"
+    },
+    "errors": {
+        "network": "Network error",
+        "invalid_data": "Invalid data",
+        "server_error": "Server error {status}"
+    }
+}

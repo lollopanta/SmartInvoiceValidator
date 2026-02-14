@@ -18,6 +18,11 @@ class Application extends BaseApplication
     public function bootstrap(): void
     {
         parent::bootstrap();
+
+        if (PHP_SAPI === 'cli') {
+            $this->addOptionalPlugin('Bake');
+            $this->addPlugin('Migrations');
+        }
     }
 
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue

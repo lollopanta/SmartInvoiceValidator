@@ -1,0 +1,48 @@
+{
+    "app": {
+        "title": "Smart {invoice} Validator",
+        "invoice": "Invoice",
+        "subtitle": "Precisione millimetrica per le tue fatture elettroniche.",
+        "badges": {
+            "auditing": "Auditing Attivo"
+        },
+        "footer": "© 2026 SmartInvoiceValidator. Tutti i diritti riservati."
+    },
+    "form": {
+        "partita_iva": "Partita IVA",
+        "imponibile": "Imponibile",
+        "aliquota_iva": "Aliquota IVA",
+        "totale_dichiarato": "Totale Dichiarato",
+        "validate_btn": "Valida Fattura",
+        "validating_btn": "Validazione...",
+        "examples": {
+            "partita_iva": "es. 12345678901",
+            "imponibile": "Importo netto",
+            "aliquota_iva": "es. 22",
+            "totale_dichiarato": "Totale con IVA"
+        }
+    },
+    "result": {
+        "valid": "Fattura Valida",
+        "invalid": "Validazione Fallita",
+        "calculated": "Totale Calcolato",
+        "errors": "Errori",
+        "warnings": "Avvisi",
+        "success_msg": "I dati della fattura sono formalmente corretti secondo le normative SDI."
+    },
+    "history": {
+        "title": "Cronologia Validazioni",
+        "empty": "Nessuna validazione recente trovata.",
+        "date": "Data",
+        "partita_iva": "Partita IVA",
+        "imponibile": "Imponibile",
+        "status": "Stato",
+        "valid": "Valida",
+        "invalid": "Non Valida"
+    },
+    "errors": {
+        "network": "Errore di rete",
+        "invalid_data": "Dati non validi",
+        "server_error": "Errore del server {status}"
+    }
+}

@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { correctPiva } from '../services/piva'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const emit = defineEmits(['validate'])
 
 const partitaIva = ref('')
@@ -18,14 +20,18 @@ defineProps({
 
 function validateClientSide() {
   const e = {}
-  if (!String(partitaIva.value || '').trim()) e.partita_iva = 'Obbligatorio'
-  else if (!/^\d{11}$/.test(String(partitaIva.value).replace(/\s/g, ''))) e.partita_iva = 'Inserire 11 cifre numeriche'
+  if (!String(partitaIva.value || '').trim()) e.partita_iva = t('errors.invalid_data')
+  else if (!/^\d{11}$/.test(String(partitaIva.value).replace(/\s/g, ''))) e.partita_iva = t('form.examples.partita_iva')
+  
   const imp = Number(imponibile.value)
-  if (imponibile.value === '' || imp < 0 || Number.isNaN(imp)) e.imponibile = 'Valore non valido'
+  if (imponibile.value === '' || imp < 0 || Number.isNaN(imp)) e.imponibile = t('errors.invalid_data')
+  
   const ali = Number(aliquotaIva.value)
-  if (aliquotaIva.value === '' || ali < 0 || Number.isNaN(ali)) e.aliquota_iva = 'Valore non valido'
+  if (aliquotaIva.value === '' || ali < 0 || Number.isNaN(ali)) e.aliquota_iva = t('errors.invalid_data')
+  
   const tot = Number(totaleDichiarato.value)
-  if (totaleDichiarato.value === '' || tot < 0 || Number.isNaN(tot)) e.totale_dichiarato = 'Valore non valido'
+  if (totaleDichiarato.value === '' || tot < 0 || Number.isNaN(tot)) e.totale_dichiarato = t('errors.invalid_data')
+  
   errors.value = e
   return Object.keys(e).length === 0
 }
@@ -93,15 +99,15 @@ onUnmounted(() => {
       <form ref="formRef" class="invoice-form" @submit.prevent="submit">
         <div class="form-group mb-4">
           <div class="d-flex justify-content-between align-items-center mb-2">
-            <label class="mb-0" for="partita_iva">Partita IVA</label>
+            <label class="mb-0" for="partita_iva">{{ t('form.partita_iva') }}</label>
             <button 
               type="button" 
               class="btn btn-sm btn-outline-primary py-1 px-2" 
-              title="Correggi dati"
+              :title="t('form.validate_btn')"
               @click="fixInputs"
               v-if="partitaIva || imponibile"
             >
-              <i class="fas fa-calculator mr-1"></i> Correggi
+              <i class="fas fa-calculator mr-1"></i> {{ t('form.validate_btn').split(' ')[0] }}
             </button>
           </div>
           <input
@@ -111,7 +117,7 @@ onUnmounted(() => {
             type="text"
             inputmode="numeric"
             maxlength="11"
-            placeholder="11 cifre"
+            :placeholder="t('form.examples.partita_iva')"
             class="form-control"
             :class="{ 'is-invalid': errors.partita_iva }"
             :disabled="loading"
@@ -119,7 +125,7 @@ onUnmounted(() => {
           <span v-if="errors.partita_iva" class="invalid-feedback d-block">{{ errors.partita_iva }}</span>
         </div>
         <div class="form-group">
-          <label for="imponibile">Imponibile (€)</label>
+          <label for="imponibile">{{ t('form.imponibile') }} (€)</label>
           <input
             id="imponibile"
             v-model.number="imponibile"
@@ -127,7 +133,7 @@ onUnmounted(() => {
             type="number"
             step="0.01"
             min="0"
-            placeholder="0.00"
+            :placeholder="t('form.examples.imponibile')"
             class="form-control"
             :class="{ 'is-invalid': errors.imponibile }"
             :disabled="loading"
@@ -135,7 +141,7 @@ onUnmounted(() => {
           <span v-if="errors.imponibile" class="invalid-feedback d-block">{{ errors.imponibile }}</span>
         </div>
         <div class="form-group">
-          <label for="aliquota_iva">Aliquota IVA (%)</label>
+          <label for="aliquota_iva">{{ t('form.aliquota_iva') }} (%)</label>
           <input
             id="aliquota_iva"
             v-model="aliquotaIva"
@@ -143,7 +149,7 @@ onUnmounted(() => {
             type="number"
             step="0.01"
             min="0"
-            placeholder="22"
+            :placeholder="t('form.examples.aliquota_iva')"
             class="form-control"
             :class="{ 'is-invalid': errors.aliquota_iva }"
             :disabled="loading"
@@ -151,7 +157,7 @@ onUnmounted(() => {
           <span v-if="errors.aliquota_iva" class="invalid-feedback d-block">{{ errors.aliquota_iva }}</span>
         </div>
         <div class="form-group">
-          <label for="totale_dichiarato">Totale dichiarato (€)</label>
+          <label for="totale_dichiarato">{{ t('form.totale_dichiarato') }} (€)</label>
           <input
             id="totale_dichiarato"
             v-model.number="totaleDichiarato"
@@ -159,7 +165,7 @@ onUnmounted(() => {
             type="number"
             step="0.01"
             min="0"
-            placeholder="0.00"
+            :placeholder="t('form.examples.totale_dichiarato')"
             class="form-control"
             :class="{ 'is-invalid': errors.totale_dichiarato }"
             :disabled="loading"
@@ -171,7 +177,7 @@ onUnmounted(() => {
           class="btn btn-primary lift"
           :disabled="loading"
         >
-          {{ loading ? 'Verifica in corso…' : 'Valida' }}
+          {{ loading ? t('form.validating_btn') : t('form.validate_btn') }}
         </button>
       </form>
     </div>
