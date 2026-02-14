@@ -1,0 +1,35 @@
+{
+    "app": {
+        "title": "Smart Invoice Validator",
+        "subtitle": "Precisione per le tue fatture",
+        "auditing": "Auditing Attivo"
+    },
+    "form": {
+        "piva": "Partita IVA",
+        "amount": "Imponibile",
+        "rate": "Aliquota IVA",
+        "total": "Totale Dichiarato",
+        "validate": "Valida Fattura",
+        "validating": "Validazione...",
+        "piva_placeholder": "11 cifre",
+        "amount_placeholder": "0.00"
+    },
+    "result": {
+        "valid": "Documento Valido",
+        "invalid": "Validazione Fallita",
+        "errors": "Errori",
+        "warnings": "Avvisi",
+        "success": "Tutti i controlli superati con successo."
+    },
+    "history": {
+        "title": "Cronologia Recente",
+        "empty": "Nessuna validazione recente.",
+        "valid": "Valida",
+        "invalid": "Non Valida"
+    },
+    "errors": {
+        "network": "Errore di rete. Verifica la connessione al backend.",
+        "invalid_data": "Dati non validi",
+        "generic": "Si è verificato un errore"
+    }
+}

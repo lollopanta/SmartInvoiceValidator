@@ -1,0 +1,35 @@
+{
+    "app": {
+        "title": "Smart Invoice Validator",
+        "subtitle": "Precision for your invoices",
+        "auditing": "Auditing Active"
+    },
+    "form": {
+        "piva": "VAT Number",
+        "amount": "Taxable Amount",
+        "rate": "VAT Rate",
+        "total": "Declared Total",
+        "validate": "Validate Invoice",
+        "validating": "Validating...",
+        "piva_placeholder": "11 digits",
+        "amount_placeholder": "0.00"
+    },
+    "result": {
+        "valid": "Document Valid",
+        "invalid": "Validation Failed",
+        "errors": "Errors",
+        "warnings": "Warnings",
+        "success": "All checks passed successfully."
+    },
+    "history": {
+        "title": "Recent History",
+        "empty": "No recent validations.",
+        "valid": "Valid",
+        "invalid": "Invalid"
+    },
+    "errors": {
+        "network": "Network error. Please check backend connection.",
+        "invalid_data": "Invalid input data",
+        "generic": "Something went wrong"
+    }
+}
