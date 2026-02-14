@@ -14,6 +14,7 @@
 !/tmp/tests/.gitkeep
 /tmp/coverage/*
 !/tmp/coverage/.gitkeep
+/bin/
 
 # Frontend
 /frontend/node_modules/

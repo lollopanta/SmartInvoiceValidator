@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
         borderRadius: Theme.radius.md,
         backgroundColor: Theme.colors.white,
         borderLeftWidth: 4,
+        ...Theme.shadows.light,
     },
     validBorder: {
         borderLeftColor: Theme.colors.success,
@@ -49,9 +50,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#fef2f2',
     },
     title: {
-        fontSize: 16,
-        fontWeight: '700',
-        marginBottom: Theme.spacing.sm,
+        fontSize: 15,
+        fontWeight: '800',
+        marginBottom: Theme.spacing.xs,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     validText: { color: Theme.colors.success },
     invalidText: { color: Theme.colors.danger },
@@ -59,14 +62,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#991b1b',
         marginBottom: 4,
+        lineHeight: 20,
     },
     warningText: {
         fontSize: 13,
-        color: '#92400e',
+        color: Theme.colors.warning,
         marginTop: 4,
+        fontWeight: '600',
     },
     successText: {
         fontSize: 14,
         color: '#065f46',
+        fontWeight: '600',
     }
 });

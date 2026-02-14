@@ -92,14 +92,12 @@ export default function InvoiceForm({ onValidate, loading }) {
 
 const styles = StyleSheet.create({
     container: {
-        padding: Theme.spacing.md,
+        padding: Theme.spacing.lg,
         backgroundColor: Theme.colors.white,
         borderRadius: Theme.radius.lg,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+        ...Theme.shadows.light,
     },
     inputGroup: {
         marginBottom: Theme.spacing.md,
@@ -108,18 +106,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     label: {
-        fontSize: 14,
-        fontWeight: '600',
+        fontSize: 13,
+        fontWeight: '700',
         color: Theme.colors.text,
         marginBottom: Theme.spacing.xs,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     input: {
         borderWidth: 1,
         borderColor: Theme.colors.border,
         borderRadius: Theme.radius.md,
-        padding: Theme.spacing.sm,
+        padding: Theme.spacing.md,
         fontSize: 16,
         color: Theme.colors.text,
+        backgroundColor: '#fcfdfe',
     },
     button: {
         backgroundColor: Theme.colors.primary,
@@ -127,6 +128,11 @@ const styles = StyleSheet.create({
         borderRadius: Theme.radius.md,
         alignItems: 'center',
         marginTop: Theme.spacing.sm,
+        shadowColor: Theme.colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
     },
     buttonDisabled: {
         opacity: 0.6,
@@ -135,5 +141,6 @@ const styles = StyleSheet.create({
         color: Theme.colors.white,
         fontSize: 16,
         fontWeight: '700',
+        letterSpacing: 0.5,
     },
 });

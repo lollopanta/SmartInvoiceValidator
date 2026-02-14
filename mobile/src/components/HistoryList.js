@@ -13,7 +13,7 @@ export default function HistoryList({ history }) {
                 <Text style={styles.date}>{new Date(item.created).toLocaleDateString()}</Text>
             </View>
             <View style={styles.itemSide}>
-                <Text style={styles.amount}>€{item.imponibile.toFixed(2)}</Text>
+                <Text style={styles.amount}>€{(parseFloat(item.imponibile) || 0).toFixed(2)}</Text>
                 <View style={[styles.badge, item.valid ? styles.badgeSuccess : styles.badgeDanger]}>
                     <Text style={styles.badgeText}>
                         {item.valid ? t('history.valid') : t('history.invalid')}
@@ -42,28 +42,30 @@ export default function HistoryList({ history }) {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: Theme.spacing.lg,
+        marginTop: Theme.spacing.xl,
     },
     title: {
         fontSize: 18,
         fontWeight: '700',
         color: Theme.colors.text,
         marginBottom: Theme.spacing.md,
+        letterSpacing: -0.2,
     },
     empty: {
         textAlign: 'center',
         color: Theme.colors.muted,
-        padding: Theme.spacing.lg,
+        padding: Theme.spacing.xl,
     },
     item: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: Theme.colors.white,
+        backgroundColor: Theme.colors.glass,
         padding: Theme.spacing.md,
         borderRadius: Theme.radius.md,
         marginBottom: Theme.spacing.sm,
         borderWidth: 1,
-        borderColor: Theme.colors.border,
+        borderColor: Theme.colors.glassBorder,
+        ...Theme.shadows.light,
     },
     itemMain: {
         justifyContent: 'center',
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     },
     amount: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '700',
         color: Theme.colors.text,
         marginBottom: 4,
     },
@@ -102,5 +104,6 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: '700',
         color: Theme.colors.text,
+        textTransform: 'uppercase',
     },
 });

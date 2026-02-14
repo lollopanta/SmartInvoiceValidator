@@ -1,0 +1,12 @@
+vendor
+tmp
+logs
+.env
+.git
+.dockerignore
+composer.lock
+Dockerfile
+docker-compose.yml
+frontend
+mobile
+node_modules

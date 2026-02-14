@@ -17,9 +17,16 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# Copy dependency files first
 COPY composer.json composer.lock* ./
-RUN composer install --no-dev --no-scripts --no-autoloader 2>/dev/null || composer install --no-scripts --no-autoloader
+
+# Install dependencies
+RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist
+
+# Copy the rest of the application
 COPY . .
+
+# Generate autoloader
 RUN composer dump-autoload --optimize
 
 RUN mkdir -p tmp/cache tmp/sessions logs && chown -R www-data:www-data /var/www/html
