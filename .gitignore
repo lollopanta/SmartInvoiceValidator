@@ -1,0 +1,33 @@
+/vendor/
+/.env
+/.env.example
+/config/app_local.php
+/logs/*
+!/logs/.gitkeep
+/tmp/*
+!/tmp/.gitkeep
+/tmp/cache/*
+!/tmp/cache/.gitkeep
+/tmp/sessions/*
+!/tmp/sessions/.gitkeep
+/tmp/tests/*
+!/tmp/tests/.gitkeep
+/tmp/coverage/*
+!/tmp/coverage/.gitkeep
+
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.env
+/frontend/.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Misc
+.phpunit.result.cache
+.DS_Store
+

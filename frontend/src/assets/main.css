@@ -1,0 +1,31 @@
+/* App-specific overrides and validation UI (theme + custom.css provide base) */
+
+/* Status badge pill (reference: badge-primary-soft, light-box) */
+.status-pill {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+}
+.status-pill.badge-primary-soft {
+  background-color: #e8f9f6;
+  color: #1bad97;
+}
+.status-pill.badge-invalid-custom {
+  background-color: #FCECEB;
+  color: #802219;
+}
+.status-pill.badge-warning-custom {
+  background-color: #FCF3D6;
+  color: #B28A12;
+}
+
+/* Validation result card: light box / features-box style like reference */
+.result-card.card {
+  border: 1px solid #F0F2F2;
+  border-radius: 12px;
+}
+
+.result-total strong {
+  color: #323333;
+}
