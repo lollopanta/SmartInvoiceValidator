@@ -14,7 +14,7 @@ class InvoiceValidatorService
 
     private const TOLERANCE_ERROR = 0.01;
 
-    protected \Cake\ORM\Table $table;
+    protected ?\Cake\ORM\Table $table;
 
     /**
      * Constructor
@@ -23,7 +23,8 @@ class InvoiceValidatorService
      */
     public function __construct(?\Cake\ORM\Table $table = null)
     {
-        $this->table = $table ?? \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
+        // Lazy-load by default so API doesn't 500 when migrations aren't run yet.
+        $this->table = $table;
     }
 
     /**
@@ -39,9 +40,9 @@ class InvoiceValidatorService
         $warnings = [];
 
         $partitaIva = (string)($data['partita_iva'] ?? '');
-        $imponibile = isset($data['imponibile']) ? $this->toFloat($data['imponibile']) : 0.0;
-        $aliquotaIva = isset($data['aliquota_iva']) ? $this->toFloat($data['aliquota_iva']) : 0.0;
-        $totaleDichiarato = isset($data['totale_dichiarato']) ? $this->toFloat($data['totale_dichiarato']) : 0.0;
+        $imponibile = $this->parseNumber($data['imponibile'] ?? null, 'imponibile', $errors);
+        $aliquotaIva = $this->parseNumber($data['aliquota_iva'] ?? null, 'aliquota_iva', $errors);
+        $totaleDichiarato = $this->parseNumber($data['totale_dichiarato'] ?? null, 'totale_dichiarato', $errors);
 
         // Partita IVA Specific Validation
         if ($partitaIva === '' || strlen($partitaIva) !== self::VAT_DIGITS || !ctype_digit($partitaIva)) {
@@ -83,19 +84,23 @@ class InvoiceValidatorService
 
         $isValid = $errors === [];
 
-        // Validation History Persistence
-        $entity = $this->table->newEntity([
-            'partita_iva' => substr($partitaIva, 0, 11),
-            'imponibile' => $imponibile,
-            'aliquota_iva' => $aliquotaIva,
-            'totale_dichiarato' => $totaleDichiarato,
-            'total_calculated' => $totalCalculated,
-            'valid' => $isValid,
-            'errors' => $errors,
-            'warnings' => $warnings,
-            'created' => new \Cake\I18n\DateTime(),
-        ]);
-        $this->table->save($entity);
+        // Validation History Persistence (best-effort; don't 500 if DB/migration missing)
+        try {
+            $table = $this->table ?? \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
+            $entity = $table->newEntity([
+                'partita_iva' => substr($partitaIva, 0, 11),
+                'imponibile' => $imponibile,
+                'aliquota_iva' => $aliquotaIva,
+                'totale_dichiarato' => $totaleDichiarato,
+                'total_calculated' => $totalCalculated,
+                'valid' => $isValid,
+                'errors' => $errors,
+                'warnings' => $warnings,
+            ]);
+            $table->save($entity);
+        } catch (\Throwable $e) {
+            $warnings[] = 'Impossibile salvare la cronologia di validazione (DB non inizializzato).';
+        }
 
         return [
             'valid' => $isValid,
@@ -148,20 +153,24 @@ class InvoiceValidatorService
         return (int)$str[10] === $checkDigit;
     }
 
-    private function toFloat(mixed $value): ?float
+    /**
+     * @param list<string> $errors
+     */
+    private function parseNumber(mixed $value, string $field, array &$errors): float
     {
         if (is_numeric($value)) {
             return (float)$value;
         }
 
-        if (is_string($value) && $value !== '') {
+        if (is_string($value)) {
             $trimmed = trim($value);
-            if (is_numeric($trimmed)) {
+            if ($trimmed !== '' && is_numeric($trimmed)) {
                 return (float)$trimmed;
             }
         }
 
-        return null;
+        $errors[] = sprintf('Il campo `%s` deve essere un numero.', $field);
+        return 0.0;
     }
 
     private function round2(float $value): float

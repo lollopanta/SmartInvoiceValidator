@@ -6,7 +6,29 @@
         "badges": {
             "auditing": "Auditing Active"
         },
-        "footer": "© 2026 SmartInvoiceValidator. All rights reserved."
+        "footer": "© 2026 SmartInvoiceValidator. All rights reserved.",
+        "nav": {
+            "home": "Home",
+            "statistics": "Statistics"
+        },
+        "view_statistics": "View Statistics"
+    },
+    "statistics": {
+        "title": "Analytics Dashboard",
+        "subtitle": "Insights on validation performance and recurring errors.",
+        "history_title": "Validation History",
+        "columns": {
+            "date": "Date",
+            "amount": "Amount",
+            "status": "Status",
+            "errors": "Errors"
+        },
+        "kpi": {
+            "total": "Total Validations",
+            "success_rate": "Success Rate",
+            "failed": "Failed Invoices",
+            "warnings": "Warnings"
+        }
     },
     "form": {
         "partita_iva": "VAT Number",

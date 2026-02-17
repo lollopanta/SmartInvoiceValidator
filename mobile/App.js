@@ -54,7 +54,10 @@ export default function App() {
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="dark-content" />
         <View style={styles.header}>
-          <View>
+          <TouchableOpacity style={styles.langButton} onPress={toggleLanguage}>
+            <Text style={styles.langButtonText}>{i18n.language.toUpperCase()}</Text>
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
             <View style={styles.badgeNew}>
               <Text style={styles.badgeNewText}>{t('app.auditing')}</Text>
             </View>
@@ -82,9 +85,6 @@ export default function App() {
             </View>
             <Text style={styles.subtitle}>{t('app.subtitle')}</Text>
           </View>
-          <TouchableOpacity style={styles.langButton} onPress={toggleLanguage}>
-            <Text style={styles.langButtonText}>{i18n.language.toUpperCase()}</Text>
-          </TouchableOpacity>
         </View>
 
         <ScrollView
@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
+    flexShrink: 0,
   },
   langButtonText: {
     color: Theme.colors.primary,
@@ -181,5 +182,9 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 10,
     color: Theme.colors.muted,
-  }
+  },
+  headerTitleContainer: {
+    flex: 1,
+    marginLeft: 10,
+  },
 });

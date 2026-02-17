@@ -28,9 +28,26 @@ class CorsMiddleware implements MiddlewareInterface
         ServerRequestInterface $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
+        $origin = $request->getHeaderLine('Origin');
+        
+        // Default headers
+        $headers = [
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With',
+            'Access-Control-Max-Age' => '3600',
+        ];
+
+        // If origin is present, echo it back (or validate it against a whitelist in production)
+        if ($origin) {
+            $headers['Access-Control-Allow-Origin'] = $origin;
+            $headers['Access-Control-Allow-Credentials'] = 'true';
+        } else {
+             $headers['Access-Control-Allow-Origin'] = '*';
+        }
+
         if ($request->getMethod() === 'OPTIONS') {
             $response = new Response();
-            foreach (self::CORS_HEADERS as $name => $value) {
+            foreach ($headers as $name => $value) {
                 $response = $response->withHeader($name, $value);
             }
             return $response->withStatus(204);
@@ -38,7 +55,7 @@ class CorsMiddleware implements MiddlewareInterface
 
         $response = $handler->handle($request);
 
-        foreach (self::CORS_HEADERS as $name => $value) {
+        foreach ($headers as $name => $value) {
             $response = $response->withHeader($name, $value);
         }
 

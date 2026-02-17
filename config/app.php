@@ -36,7 +36,6 @@ return [
         'default' => [
             'className' => FileEngine::class,
             'path' => CACHE,
-            'url' => env('CACHE_DEFAULT_URL', null),
         ],
         '_cake_translations_' => [
             'className' => FileEngine::class,
@@ -44,7 +43,6 @@ return [
             'path' => CACHE . 'persistent' . DS,
             'serialize' => true,
             'duration' => '+1 years',
-            'url' => env('CACHE_CAKECORE_URL', null),
         ],
         '_cake_model_' => [
             'className' => FileEngine::class,
@@ -52,7 +50,6 @@ return [
             'path' => CACHE . 'models' . DS,
             'serialize' => true,
             'duration' => '+1 years',
-            'url' => env('CACHE_CAKEMODEL_URL', null),
         ],
     ],
     'Error' => [
@@ -103,7 +100,6 @@ return [
             'className' => FileLog::class,
             'path' => LOGS,
             'file' => 'debug',
-            'url' => env('LOG_DEBUG_URL', null),
             'scopes' => null,
             'levels' => ['notice', 'info', 'debug'],
         ],
@@ -111,7 +107,6 @@ return [
             'className' => FileLog::class,
             'path' => LOGS,
             'file' => 'error',
-            'url' => env('LOG_ERROR_URL', null),
             'scopes' => null,
             'levels' => ['warning', 'error', 'critical', 'alert', 'emergency'],
         ],

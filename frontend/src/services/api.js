@@ -1,31 +1,72 @@
+import axios from 'axios'
+
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
+const client = axios.create({
+  baseURL: API_BASE,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 /**
- * API service for invoice validation.
- * All API calls live here; components use this module only.
+ * GET /api/v1/statistics/summary
  */
-
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/$/, '')
-const HISTORY_PATH = '/api/v1/invoices'
-const VALIDATE_PATH = '/api/v1/invoices/validate'
+export async function getStatisticsSummary() {
+  try {
+    const res = await client.get('/api/v1/statistics/summary')
+    return res.data
+  } catch (err) {
+    console.error('Failed to fetch summary:', err)
+    return null
+  }
+}
 
 /**
- * @typedef {Object} HistoryRecord
- * @property {string} id
- * @property {string} partita_iva
- * @property {number} imponibile
- * @property {boolean} valid
- * @property {string} created
+ * GET /api/v1/statistics/timeline
  */
+export async function getStatisticsTimeline(range = '7d') {
+  try {
+    const res = await client.get('/api/v1/statistics/timeline', { params: { range } })
+    return res.data
+  } catch (err) {
+    console.error('Failed to fetch timeline:', err)
+    return []
+  }
+}
 
 /**
- * GET /api/v1/invoices
- * @returns {Promise<HistoryRecord[]>}
+ * GET /api/v1/statistics/errors
+ */
+export async function getStatisticsErrors() {
+  try {
+    const res = await client.get('/api/v1/statistics/errors')
+    return res.data
+  } catch (err) {
+    console.error('Failed to fetch errors:', err)
+    return []
+  }
+}
+
+/**
+ * GET /api/v1/invoices/validations (Paginated)
+ */
+export async function getPaginatedValidations(params = {}) {
+  try {
+    const res = await client.get('/api/v1/invoices/validations', { params })
+    return res.data
+  } catch (err) {
+    console.error('Failed to fetch paginated history:', err)
+    return { data: [], pagination: {} }
+  }
+}
+
+/**
+ * GET /api/v1/invoices (Legacy/Simple)
  */
 export async function getValidationHistory() {
-  const url = `${API_BASE.replace(/\/$/, '')}${HISTORY_PATH}`
   try {
-    const res = await fetch(url)
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
-    return await res.json()
+    const res = await client.get('/api/v1/invoices')
+    return res.data
   } catch (err) {
     console.error('Failed to fetch history:', err)
     return []
@@ -34,37 +75,18 @@ export async function getValidationHistory() {
 
 /**
  * POST /api/v1/invoices/validate
- * @param {ValidatePayload} payload
- * @returns {Promise<{ ok: true, status: number, data: ValidateResult } | { ok: false, status?: number, error: string, data?: ValidateResult }>}
  */
 export async function validateInvoice(payload) {
-  const url = `${API_BASE.replace(/\/$/, '')}${VALIDATE_PATH}`
-
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    const data = await res.json().catch(() => null)
-
-    if (res.ok) {
-      return { ok: true, status: res.status, data }
-    }
-
-    return {
-      ok: false,
-      status: res.status,
-      error: res.status === 422 ? 'Dati non validi' : `Errore ${res.status}`,
-      data: data || undefined,
-    }
+    const res = await client.post('/api/v1/invoices/validate', payload)
+    return { ok: true, status: res.status, data: res.data }
   } catch (err) {
+    const res = err.response
     return {
       ok: false,
-      error: err.message || 'Errore di rete',
+      status: res?.status,
+      error: res?.status === 422 ? 'Dati non validi' : (err.message || 'Errore di rete'),
+      data: res?.data,
     }
   }
 }

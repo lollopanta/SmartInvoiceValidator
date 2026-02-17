@@ -28,8 +28,8 @@ class Application extends BaseApplication
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         $middlewareQueue
-            ->add(new \Cake\Error\Middleware\ErrorHandlerMiddleware(Configure::read('Error'), $this))
             ->add(new \App\Middleware\CorsMiddleware())
+            ->add(new \Cake\Error\Middleware\ErrorHandlerMiddleware(Configure::read('Error'), $this))
             ->add(new \Cake\Routing\Middleware\AssetMiddleware([
             'cacheTime' => Configure::read('Asset.cacheTime'),
         ]))

@@ -22,14 +22,19 @@ class InvoicesController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
-        $history = $table->find()
-            ->select(['id', 'partita_iva', 'imponibile', 'valid', 'created'])
-            ->orderBy(['created' => 'DESC'])
-            ->limit(10)
-            ->all();
+        try {
+            $table = \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
+            $history = $table->find()
+                ->select(['id', 'partita_iva', 'imponibile', 'valid', 'created'])
+                ->orderBy(['created' => 'DESC'])
+                ->limit(10)
+                ->all();
 
-        return $this->respondJson(200, $history->toArray());
+            return $this->respondJson(200, $history->toArray());
+        } catch (\Throwable $e) {
+            // If DB/migrations aren't ready yet, don't break the frontend.
+            return $this->respondJson(200, []);
+        }
     }
 
     /**
@@ -75,6 +80,47 @@ class InvoicesController extends AppController
         $result = $validator->validate($data);
 
         return $this->respondJson(200, $result);
+    }
+
+    /**
+     * GET /api/v1/invoices/validations
+     * Paginated history with sorting.
+     */
+    public function validations(): Response
+    {
+        $this->request->allowMethod(['get']);
+        
+        $table = \Cake\ORM\TableRegistry::getTableLocator()->get('InvoiceValidations');
+        
+        $sort = $this->request->getQuery('sort', 'created');
+        $direction = $this->request->getQuery('direction', 'DESC');
+        $limit = (int)$this->request->getQuery('limit', 10);
+        $page = (int)$this->request->getQuery('page', 1);
+
+        $query = $table->find()
+            ->orderBy([$sort => $direction]);
+
+        $this->paginate = [
+            'limit' => $limit,
+            'page' => $page,
+        ];
+
+        try {
+            $validations = $this->paginate($query);
+            $pagingParams = $this->request->getAttribute('paging')['InvoiceValidations'];
+            
+            return $this->respondJson(200, [
+                'data' => $validations->toArray(),
+                'pagination' => [
+                    'count' => $pagingParams['count'],
+                    'current' => $pagingParams['page'],
+                    'pages' => $pagingParams['pageCount'],
+                    'limit' => $pagingParams['limit'],
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return $this->respondJson(200, ['data' => [], 'pagination' => []]);
+        }
     }
 
     private function respondJson(int $status, array $body): Response

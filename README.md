@@ -113,6 +113,25 @@ composer test
 MIT.
 
 
+## Analytics Module
+
+### Rationale
+Tracking validation metrics is crucial in a SaaS invoicing system to:
+- **Reduce SDI Rejections**: By analyzing recurring errors (like incorrect VAT formats or calculation mismatches) before submission, users can fix issues at the source, significantly lowering the rejection rate by the **Sistema di Interscambio (SDI)**.
+- **Improve UX**: Error frequency insights allow developers to identify confusing parts of the UI or common data entry mistakes, leading to a better user experience.
+- **Server-side Aggregation**: For performance and security, all complex data aggregations and historical analysis are performed server-side using **CakePHP ORM**. This ensures the frontend remains lightweight and responsive even with thousands of records.
+
+### API Endpoints
+All analytics endpoints are versioned under `/api/v1/statistics`:
+
+- `GET /summary`: Quick KPI overview (total, valid rate, errors).
+- `GET /timeline?range={7d|30d|90d}`: Historical trend of valid/invalid invoices.
+- `GET /errors`: Frequency distribution of failure types.
+- `GET /invoices/validations`: Paged and sortable validation history.
+  - **Params**: `page`, `limit`, `sort` (created|imponibile|valid), `direction` (asc|desc).
+
+---
+
 ## Validation History Persistence
 
 Every validation attempt is persisted to the `invoice_validations` table for auditing and analytics purposes.

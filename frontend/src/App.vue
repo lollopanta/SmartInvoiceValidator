@@ -1,103 +1,71 @@
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
-import InvoiceForm from './components/InvoiceForm.vue'
-import ValidationResult from './components/ValidationResult.vue'
-import HistorySection from './components/HistorySection.vue'
 import LanguageSwitcher from './components/LanguageSwitcher.vue'
-import { validateInvoice, getValidationHistory } from './services/api'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const result = ref(null)
-const loading = ref(false)
-const historyLoading = ref(false)
-const history = ref([])
-const resultRef = ref(null)
-
-async function fetchHistory() {
-  historyLoading.value = true
-  history.value = await getValidationHistory()
-  historyLoading.value = false
-}
-
-async function handleValidate(payload) {
-  loading.value = true
-  result.value = null
-  const response = await validateInvoice(payload)
-  loading.value = false
-  result.value = response
-  
-  if (response.ok) {
-    // Refresh history after validation
-    fetchHistory()
-  }
-
-  await nextTick()
-  scrollToResult()
-}
-
-function scrollToResult() {
-  if (typeof window !== 'undefined' && window.$ && resultRef.value?.$el) {
-    const $el = window.$(resultRef.value.$el)
-    $el.hide().slideDown(280)
-    window.$('html, body').animate(
-      { scrollTop: $el.offset().top - 24 },
-      400
-    )
-  }
-}
-
-onMounted(() => {
-  fetchHistory()
-})
 </script>
 
 <template>
   <div class="app-wrap">
     <div class="bg-shape"></div>
     
-    <section class="py-6 pb-lg-9 content-layer">
-      <div class="container main-container">
-        <div class="d-flex justify-content-end mb-4">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2 sticky-top">
+      <div class="container">
+        <router-link class="navbar-brand font-weight-bold d-flex align-items-center" to="/">
+          <span class="text-primary-gradient mr-1">Smart</span>Validator
+        </router-link>
+        
+        <div class="ml-auto d-flex align-items-center">
+          <ul class="navbar-nav mr-4 d-none d-md-flex">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/" active-class="active">{{ t('app.nav.home') || 'Home' }}</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/statistic" active-class="active">{{ t('app.nav.statistics') || 'Statistiche' }}</router-link>
+            </li>
+          </ul>
           <LanguageSwitcher />
         </div>
-
-        <header class="text-center mb-6 header-animate">
-          <div class="badge-new mb-3">{{ t('app.badges.auditing') }}</div>
-          <h1 class="font-weight-bold display-4 mb-2">
-            Smart <span class="text-primary-gradient">{{ t('app.invoice') }}</span> Validator
-          </h1>
-          <p class="font-size-lg text-main mb-0 opacity-80">
-            {{ t('app.subtitle') }}
-          </p>
-        </header>
-
-        <div class="row">
-          <div class="col-12 col-lg-8 offset-lg-2">
-            <InvoiceForm
-              :loading="loading"
-              @validate="handleValidate"
-            />
-
-            <ValidationResult
-              ref="resultRef"
-              :result="result"
-            />
-
-            <HistorySection
-              :history="history"
-              :loading="historyLoading"
-            />
-          </div>
-        </div>
       </div>
-    </section>
+    </nav>
+
+    <main class="py-6 content-layer">
+      <div class="container main-container">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" :key="$route.path" v-if="Component" />
+          </transition>
+        </router-view>
+      </div>
+    </main>
 
     <footer class="py-4 text-center text-muted font-size-xs opacity-50">
       &copy; 2026 SmartInvoiceValidator. Tutti i diritti riservati.
     </footer>
   </div>
 </template>
+
+<style>
+/* Global styles */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.text-primary-gradient {
+  background: linear-gradient(135deg, #2C7BE5 0%, #00d97e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+}
+
+.nav-link.active {
+  color: #2C7BE5 !important;
+  font-weight: 600;
+}
+</style>
 
 <style scoped>
 .app-wrap {

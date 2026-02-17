@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\Model\Table;
 
 use Cake\ORM\Table;
-use Cake\Database\Schema\TableSchemaInterface;
 
 /**
  * InvoiceValidations Model
@@ -26,8 +25,5 @@ class InvoiceValidationsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
-
-        $this->getSchema()->setColumnType('errors', 'json');
-        $this->getSchema()->setColumnType('warnings', 'json');
     }
 }
